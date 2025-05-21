@@ -1,0 +1,19 @@
+# Mac system files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# Mac directory metadata
+.Spotlight-V100
+.Trashes
+
+# Mac resource forks
+__MACOSX/
+
+# Only allow MDC and MD files
+*
+!*.mdc
+!*.md
+!.gitignore 
