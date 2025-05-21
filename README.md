@@ -4,56 +4,55 @@ This repository serves as a centralized location for storing and managing Cursor
 
 ## Repository Structure
 
-Each rule type folder follows the same structure:
+Each rule-set folder follows the same structure:
 ```
-type/
-├── rule-name/
-│   ├── rule-name.mdc    # The actual rule file
-│   └── README.md        # Documentation for the rule
+rule-set-name/
+├── *.mdc    # The rule files (written in plain English)
+└── README.md        # Documentation for the rule-set
 ```
 
 ## Naming Conventions
 
-### Rule Files
-- Use kebab-case for rule names (e.g., `auto-format.mdc`)
-- Rule files should be named descriptively of their function
-- Each rule should be in its own folder matching the rule name
+### Rule-Set Folders
+- Use kebab-case for rule-set names (e.g., `workshop-writer`)
+- Folder names should be descriptive of the rule-set's purpose
+- Each rule-set should be in its own folder
 
 ### Documentation
-- Each rule folder must contain a `README.md`
+- Each rule-set folder must contain a `README.md`
 - Documentation should include:
-  - Rule purpose and functionality
+  - Rule-set purpose and functionality
   - Usage instructions
   - Examples
   - Any dependencies or prerequisites
 
 ## File Types
-- `.mdc` - Cursor rule files
+- `.mdc` - Cursor rule files (written in plain English)
 - `.md` - Documentation files
 - `.gitignore` - Git ignore configuration
 
 ## Contributing
 
-When adding new rules:
+When adding new rule-sets:
 
-1. Create a new folder for your rule:
+1. Create a new folder for your rule-set:
    ```bash
-   mkdir rules/type/your-rule-name
+   mkdir your-rule-set-name
    ```
 
 2. Add your files:
-   - Create `your-rule-name.mdc` with the rule content
-   - Create `README.md` with documentation
+   - Add your `.mdc` rule files (written in plain English)
+   - Create `README.md` with documentation for the rule-set
 
 3. Follow the naming conventions:
-   - Use kebab-case for all file and folder names
+   - Use kebab-case for folder names
    - Keep names descriptive and concise
 
-4. Ensure your rule follows the `.cursor/rules` hierarchy structure for easy integration
+4. Ensure your rule-set follows the `.cursor/rules` hierarchy structure for easy integration
 
 ## Integration
 
 To use these rules in your Cursor project:
-1. Copy the desired rule folder to your project's `.cursor/rules/` directory
-2. The rule will be automatically loaded by Cursor
-3. Follow the rule's README.md for specific configuration instructions
+1. Copy the desired rule-set folder to your project's `.cursor/rules/` directory
+2. The rules will be automatically loaded by Cursor
+3. Follow the rule-set's README.md for specific configuration instructions
