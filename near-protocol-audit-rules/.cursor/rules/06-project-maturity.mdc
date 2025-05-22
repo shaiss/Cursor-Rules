@@ -1,0 +1,137 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Project Maturity Assessment Rule
+
+## Purpose
+Evaluate the maturity and activity level of NEAR Protocol projects, focusing on development activity, project maintenance, and future planning.
+
+## Evaluation Criteria
+
+### Development Activity (4 points)
+- Commit frequency and quality
+- Issue tracking and resolution
+- Pull request activity
+- Code review process
+- Development workflow
+
+### Project Maintenance (3 points)
+- Documentation updates
+- Dependency management
+- Bug fixes and patches
+- Performance monitoring
+- Security updates
+
+### Project Planning (3 points)
+- Roadmap clarity
+- Feature planning
+- Version management
+- Release strategy
+- Community engagement
+
+## Scoring Guidelines
+
+### High Maturity (8-10 points)
+- Active, regular commits
+- Ongoing development
+- Clear roadmap
+- Strong maintenance
+- Professional workflow
+
+### Moderate Maturity (4-7 points)
+- Occasional updates
+- Partial roadmap
+- Basic maintenance
+- Some planning
+- Limited workflow
+
+### Low Maturity (0-3 points)
+- Dormant project
+- Unclear future
+- Minimal maintenance
+- No clear planning
+- Basic workflow
+
+## Implementation Checklist
+
+### Development Review
+- [ ] Commit history analysis
+- [ ] Issue tracking review
+- [ ] PR process evaluation
+- [ ] Code review assessment
+- [ ] Workflow analysis
+
+### Maintenance Check
+- [ ] Documentation review
+- [ ] Dependency audit
+- [ ] Bug fix analysis
+- [ ] Performance check
+- [ ] Security review
+
+### Planning Assessment
+- [ ] Roadmap evaluation
+- [ ] Feature planning review
+- [ ] Version management check
+- [ ] Release strategy analysis
+- [ ] Community engagement review
+
+## Best Practices
+
+### Development
+- Regular, meaningful commits
+- Clear commit messages
+- Proper issue tracking
+- Thorough code reviews
+- Consistent workflow
+
+### Maintenance
+- Up-to-date documentation
+- Regular dependency updates
+- Prompt bug fixes
+- Performance monitoring
+- Security patching
+
+### Planning
+- Clear roadmap
+- Regular updates
+- Version control
+- Release planning
+- Community involvement
+
+## Common Issues
+
+### Development
+- Irregular commits
+- Poor commit messages
+- Inadequate issue tracking
+- Weak code reviews
+- Inconsistent workflow
+
+### Maintenance
+- Outdated documentation
+- Neglected dependencies
+- Delayed bug fixes
+- Poor monitoring
+- Security vulnerabilities
+
+### Planning
+- Unclear roadmap
+- Infrequent updates
+- Poor version control
+- Weak release strategy
+- Limited community engagement
+
+## Reference Materials
+
+### NEAR Protocol Patterns
+For patterns that indicate project maturity in NEAR Protocol projects, see `supplementary-near-patterns.mdc`, which contains:
+- Standard file structures of mature NEAR projects
+- Common integration patterns that evolve with project maturity
+
+### NEAR Protocol Vulnerabilities
+For security practices that indicate project maturity, see `supplementary-near-vulnerabilities.mdc`, which contains:
+- Security tools and practices for NEAR contract development
+- Common vulnerabilities that mature projects should address
+- Audit tools that indicate development maturity

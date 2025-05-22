@@ -1,0 +1,190 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# NEAR Protocol Integration Assessment Rule
+
+## Purpose
+Evaluate the depth and quality of NEAR Protocol integration in projects, focusing on standards usage, wallet integration, and on-chain innovation.
+
+## Evaluation Criteria
+
+### NEAR Standards Integration (7 points)
+- NEP standards compliance
+- Protocol feature utilization
+- Contract structure
+- Core concept implementation
+- SDK usage
+
+#### NEP Standards Implementation Details
+- **NEP-141 (Fungible Token)**
+  - `ft_transfer`, `ft_balance_of`, and storage management
+  - Token transfer and balance checking functions
+  - Storage deposit handling
+
+- **NEP-171 (Non-Fungible Token)**
+  - `nft_transfer`, `nft_mint`, `nft_token` functions
+  - NFT management and transfer operations
+  - Metadata handling
+
+- **NEP-145 (Storage Management)**
+  - Storage deposit implementation
+  - Storage withdrawal handling
+  - Account registration management
+
+### Wallet Integration (6 points)
+- Wallet connection implementation
+- Transaction handling
+- Account management
+- Security measures
+- User experience
+
+#### Wallet Integration Details
+- **Wallet Selector Implementation**
+  - `@near-wallet-selector` package usage
+  - Wallet selector hooks and components
+  - Multi-wallet support
+
+- **Transaction Handling**
+  - `signAndSendTransaction` implementation
+  - Gas estimation and deposit handling
+  - Error state management
+
+- **Contract Interactions**
+  - `viewFunction` and `callFunction` usage
+  - Argument formatting and result parsing
+  - Cross-contract call handling
+
+### On-chain Innovation (7 points)
+- Cross-contract calls
+- Promise handling
+- State management
+- Gas optimization
+- Advanced features
+
+#### Advanced Features
+- **Cross-Contract Calls**
+  - `Promise`, `ext_contract` usage
+  - Promise chaining and callback handling
+  - Batch operations
+
+- **Payable Methods**
+  - `attached_deposit` handling
+  - Minimum deposit requirements
+  - Deposit validation
+
+- **Access Control**
+  - Owner/admin/contract-only actions
+  - `predecessor_account` validation
+  - Permission management
+
+## Scoring Guidelines
+
+### Deep Integration (16-20 points)
+- Comprehensive NEP standards usage
+- Robust wallet integration
+- Advanced on-chain features
+- Clear contract structure
+- Extensive SDK usage
+
+### Moderate Integration (10-15 points)
+- Basic NEP standards usage
+- Standard wallet integration
+- Basic on-chain features
+- Simple contract structure
+- Basic SDK usage
+
+### Minimal Integration (0-9 points)
+- Limited standards usage
+- Basic wallet connection
+- Minimal on-chain features
+- Unclear contract structure
+- Limited SDK usage
+
+## Implementation Checklist
+
+### Standards Review
+- [ ] NEP compliance check
+- [ ] Protocol feature usage
+- [ ] Contract structure analysis
+- [ ] Core concept implementation
+- [ ] SDK usage evaluation
+
+### Wallet Analysis
+- [ ] Connection implementation
+- [ ] Transaction handling
+- [ ] Account management
+- [ ] Security measures
+- [ ] User experience
+
+### Innovation Assessment
+- [ ] Cross-contract calls
+- [ ] Promise implementation
+- [ ] State management
+- [ ] Gas optimization
+- [ ] Advanced features
+
+## Best Practices
+
+### Standards
+- Follow NEP guidelines
+- Use protocol features
+- Maintain clear structure
+- Implement core concepts
+- Utilize SDKs effectively
+
+### Wallet
+- Secure connections
+- Handle transactions properly
+- Manage accounts safely
+- Implement security measures
+- Ensure good UX
+
+### Innovation
+- Optimize cross-contract calls
+- Handle promises properly
+- Manage state efficiently
+- Optimize gas usage
+- Implement advanced features
+
+## Common Issues
+
+### Standards
+- Non-compliance with NEPs
+- Underutilized features
+- Poor contract structure
+- Missing core concepts
+- Limited SDK usage
+
+### Wallet
+- Insecure connections
+- Poor transaction handling
+- Weak account management
+- Missing security measures
+- Poor user experience
+
+### Innovation
+- Inefficient contract calls
+- Poor promise handling
+- State management issues
+- High gas usage
+- Limited features
+
+## Reference Materials
+
+### NEAR Protocol Patterns
+For detailed implementation patterns and code snippets to identify during assessment, see `supplementary-near-patterns.mdc`, which contains:
+- NEP-141, NEP-171, and NEP-145 implementation patterns
+- Wallet integration code examples
+- Cross-contract call patterns
+- Frontend integration patterns
+- Common file patterns for NEAR projects
+
+### NEAR Protocol Vulnerabilities
+For security considerations and common vulnerability patterns, see `supplementary-near-vulnerabilities.mdc`, which contains:
+- Common NEAR-specific vulnerabilities
+- Blockchain file patterns
+- NEAR smart contract architecture overview
+- NEAR-specific security considerations
+- Audit tools for NEAR contracts

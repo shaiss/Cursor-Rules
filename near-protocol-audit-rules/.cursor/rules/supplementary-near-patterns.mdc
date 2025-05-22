@@ -1,0 +1,114 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# NEAR Protocol Audit Search Patterns
+
+This rule provides specific search patterns to use when auditing NEAR Protocol integrations.
+
+## Key Functions and Patterns to Search For
+
+### Smart Contract (JavaScript/TypeScript)
+```
+# NEP-141 Fungible Token Functions
+ft_transfer
+ft_transfer_call
+ft_balance_of
+ft_total_supply
+ft_transfer_internal
+
+# NEP-171 NFT Functions
+nft_transfer
+nft_mint
+nft_token
+nft_tokens
+nft_tokens_for_owner
+
+# Storage Management (NEP-145)
+storage_deposit
+storage_withdraw
+storage_unregister
+
+# Cross-Contract Calls
+Promise
+ext_contract
+near.promiseBatchCreate
+near.promiseBatchThen
+near.promiseReturn
+near.promiseCreate
+NearPromise
+
+# NEAR SDK Decorators
+@call
+@view
+@NearBindgen
+@payable
+@private
+@initialize
+
+# Access Control
+predecessor_account_id
+signer_account_id
+current_account_id
+attached_deposit
+```
+
+### Frontend Integration
+```
+# Wallet Selector
+@near-wallet-selector/core
+useWalletSelector
+setupWalletSelector
+setupModal
+
+# Transaction Submission
+signAndSendTransaction
+signTransaction
+callFunction
+viewFunction
+FunctionCall
+
+# NEAR API JS
+near-api-js
+providers.JsonRpcProvider
+connect
+keyStores
+WalletConnection
+Contract
+utils.format
+```
+
+### Backend Integration
+```
+# Go/Backend Integration
+FunctionCall
+ViewFunction
+GenerateWalletURL
+TransactionRequest
+CallMethod
+SignTransaction
+```
+
+## File Patterns to Prioritize
+- `contract.js`, `contract.ts`, `*.contract.js`, `*.contract.ts`
+- `near.js`, `near.ts`, `near/*.js`, `near/*.ts`
+- `wallet.js`, `wallet.ts`
+- `*token*.js`, `*token*.ts` (for token contracts)
+- `package.json` for dependencies like:
+  - `near-sdk-js`
+  - `near-api-js`
+  - `@near-wallet-selector/*`
+  - `near-cli`
+
+## Common Integration Points
+Check these key integration points:
+- Contract deployment scripts
+- Token management code
+- User authentication with NEAR
+- Transaction signing flows
+- Contract call wrapper functions
+- Error handling for NEAR transactions
+- Network switching (mainnet/testnet)
+
+When evaluating the codebase, use these specific patterns in grep searches and code analysis to quickly identify NEAR Protocol integration points.

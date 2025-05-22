@@ -1,0 +1,138 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Code Quality & Documentation Assessment Rule
+
+## Purpose
+Evaluate the quality of code and documentation in NEAR Protocol projects, focusing on structure, testing, and documentation completeness.
+
+## Evaluation Criteria
+
+### Code Structure (5 points)
+- Modularity
+- Naming conventions
+- Style consistency
+- Organization
+- Complexity
+
+### Testing (5 points)
+- Unit test coverage
+- Integration tests
+- Test quality
+- Edge cases
+- Performance tests
+
+### Documentation (5 points)
+- README completeness
+- Code documentation
+- Architecture docs
+- API documentation
+- Usage examples
+
+## Scoring Guidelines
+
+### High Quality (12-15 points)
+- Clean, modular code
+- Comprehensive testing
+- Extensive documentation
+- Consistent style
+- Clear structure
+
+### Moderate Quality (7-11 points)
+- Moderate clarity
+- Some tests
+- Basic documentation
+- Inconsistent style
+- Basic structure
+
+### Low Quality (0-6 points)
+- Poor organization
+- Minimal testing
+- Limited documentation
+- Inconsistent style
+- Unclear structure
+
+## Implementation Checklist
+
+### Code Review
+- [ ] Modularity check
+- [ ] Naming convention review
+- [ ] Style consistency
+- [ ] Organization analysis
+- [ ] Complexity assessment
+
+### Testing Review
+- [ ] Unit test coverage
+- [ ] Integration test check
+- [ ] Test quality
+- [ ] Edge case coverage
+- [ ] Performance test review
+
+### Documentation Check
+- [ ] README review
+- [ ] Code documentation
+- [ ] Architecture docs
+- [ ] API documentation
+- [ ] Usage examples
+
+## Best Practices
+
+### Code
+- Modular design
+- Clear naming
+- Consistent style
+- Good organization
+- Manageable complexity
+
+### Testing
+- Comprehensive coverage
+- Quality tests
+- Edge case handling
+- Performance testing
+- Regular updates
+
+### Documentation
+- Complete README
+- Code comments
+- Architecture docs
+- API documentation
+- Usage examples
+
+## Common Issues
+
+### Code
+- Poor modularity
+- Unclear naming
+- Inconsistent style
+- Bad organization
+- High complexity
+
+### Testing
+- Insufficient coverage
+- Poor test quality
+- Missing edge cases
+- No performance tests
+- Outdated tests
+
+### Documentation
+- Incomplete README
+- Missing comments
+- No architecture docs
+- Poor API docs
+- No examples
+
+## Reference Materials
+
+### NEAR Protocol Patterns
+For detailed implementation patterns to evaluate in code quality assessment, see `supplementary-near-patterns.mdc`, which contains:
+- Standard NEAR function patterns for evaluating code consistency
+- File organization patterns for NEAR projects
+- Integration point guidance for documentation review
+
+### NEAR Protocol Vulnerabilities
+For security and quality considerations, see `supplementary-near-vulnerabilities.mdc`, which contains:
+- NEAR-specific architecture patterns
+- Common vulnerabilities that may indicate code quality issues
+- Tools for code quality analysis specific to NEAR contracts

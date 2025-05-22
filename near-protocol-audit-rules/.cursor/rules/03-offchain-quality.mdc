@@ -1,0 +1,132 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Offchain Quality Assessment Rule
+
+## Purpose
+Evaluate the quality and complexity of off-chain components in NEAR Protocol projects, focusing on architecture, integration quality, and technical implementation.
+
+## Evaluation Criteria
+
+### Application Architecture (5 points)
+- Standalone application type (web/mobile/desktop)
+- Framework selection and usage
+- Component structure and organization
+- State management implementation
+- Build system configuration
+
+### Integration Quality (5 points)
+- Backend service integration
+- API design and implementation
+- External service connections
+- Data flow patterns
+- Error handling and recovery
+
+### Technical Implementation (5 points)
+- Code organization and modularity
+- Performance optimization
+- Security measures
+- Testing coverage
+- Development tooling
+
+## Scoring Guidelines
+
+### High Quality (12-15 points)
+- Dedicated standalone application
+- Complex, well-structured architecture
+- Robust backend integrations
+- Comprehensive testing
+- Professional-grade tooling
+
+### Moderate Quality (7-11 points)
+- Browser extension or moderate complexity
+- Basic architecture implementation
+- Essential integrations
+- Basic testing coverage
+- Standard development tools
+
+### Basic Quality (0-6 points)
+- Simple scripts or basic tools
+- Minimal architecture
+- Limited integrations
+- Minimal testing
+- Basic development setup
+
+## Implementation Checklist
+
+### Architecture Review
+- [ ] Application type identification
+- [ ] Framework analysis
+- [ ] Component structure review
+- [ ] State management evaluation
+- [ ] Build system assessment
+
+### Integration Analysis
+- [ ] Backend service review
+- [ ] API design evaluation
+- [ ] External service audit
+- [ ] Data flow verification
+- [ ] Error handling assessment
+
+### Technical Assessment
+- [ ] Code organization review
+- [ ] Performance analysis
+- [ ] Security measures check
+- [ ] Test coverage evaluation
+- [ ] Development tooling audit
+
+## Best Practices
+
+### Architecture
+- Use appropriate frameworks for the application type
+- Implement clear separation of concerns
+- Follow established design patterns
+- Ensure scalability and maintainability
+
+### Integration
+- Implement robust error handling
+- Use secure communication protocols
+- Maintain clear API documentation
+- Implement proper authentication
+
+### Technical
+- Follow coding standards
+- Implement comprehensive testing
+- Use appropriate development tools
+- Maintain performance optimization
+
+## Common Issues
+
+### Architecture
+- Poor component organization
+- Inappropriate framework choice
+- Lack of scalability planning
+- Insufficient state management
+
+### Integration
+- Weak error handling
+- Insecure communication
+- Poor API design
+- Insufficient documentation
+
+### Technical
+- Inconsistent coding style
+- Insufficient testing
+- Performance bottlenecks
+- Security vulnerabilities
+
+## Reference Materials
+
+### NEAR Protocol Patterns
+For frontend and integration patterns related to off-chain components, see `supplementary-near-patterns.mdc`, which contains:
+- Frontend integration patterns
+- Wallet selector implementation guidance
+- Common file patterns for off-chain components
+
+### NEAR Protocol Vulnerabilities
+For security considerations in off-chain components, see `supplementary-near-vulnerabilities.mdc`, which contains:
+- Common vulnerabilities in blockchain frontend applications
+- Integration security patterns
+- Frontend-to-contract security considerations

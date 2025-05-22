@@ -1,0 +1,124 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Financial Scheme Analysis Rule
+
+## Purpose
+Evaluate the robustness of financial protections in NEAR Protocol projects, focusing on prevention of wash trading, Ponzi schemes, and other financial fraud.
+
+## Evaluation Criteria
+
+### Wash Trading Protection (5 points)
+- Transaction validation
+- Volume verification
+- Price manipulation detection
+- Trading pattern analysis
+- Anti-collusion measures
+
+### Ponzi Scheme Prevention (5 points)
+- Return mechanism analysis
+- Fund flow tracking
+- Sustainability checks
+- Risk assessment
+- Transparency measures
+
+### General Fraud Prevention (5 points)
+- Security audits
+- Transaction monitoring
+- Risk controls
+- Compliance checks
+- Emergency measures
+
+## Scoring Guidelines
+
+### Robust Protection (12-15 points)
+- Comprehensive wash trading protection
+- Strong Ponzi scheme prevention
+- Thorough fraud prevention
+- Regular security audits
+- Clear risk controls
+
+### Partial Protection (7-11 points)
+- Basic wash trading checks
+- Some Ponzi prevention
+- Limited fraud protection
+- Occasional audits
+- Basic risk controls
+
+### Minimal Protection (0-6 points)
+- No wash trading protection
+- Weak Ponzi prevention
+- Limited fraud protection
+- No security audits
+- Poor risk controls
+
+## Implementation Checklist
+
+### Wash Trading Review
+- [ ] Transaction validation
+- [ ] Volume verification
+- [ ] Price manipulation
+- [ ] Trading patterns
+- [ ] Anti-collusion
+
+### Ponzi Prevention
+- [ ] Return mechanism
+- [ ] Fund flow
+- [ ] Sustainability
+- [ ] Risk assessment
+- [ ] Transparency
+
+### Fraud Prevention
+- [ ] Security audits
+- [ ] Transaction monitoring
+- [ ] Risk controls
+- [ ] Compliance
+- [ ] Emergency measures
+
+## Best Practices
+
+### Wash Trading
+- Strong validation
+- Volume verification
+- Price monitoring
+- Pattern analysis
+- Anti-collusion
+
+### Ponzi Prevention
+- Sustainable returns
+- Fund tracking
+- Risk assessment
+- Transparency
+- Regular audits
+
+### Fraud Prevention
+- Regular audits
+- Active monitoring
+- Strong controls
+- Compliance
+- Emergency plans
+
+## Common Issues
+
+### Wash Trading
+- Weak validation
+- No volume checks
+- Price manipulation
+- Pattern issues
+- Collusion risks
+
+### Ponzi Prevention
+- Unsustainable returns
+- Poor fund tracking
+- High risk
+- Lack of transparency
+- No audits
+
+### Fraud Prevention
+- Missing audits
+- Poor monitoring
+- Weak controls
+- Non-compliance
+- No emergency plan

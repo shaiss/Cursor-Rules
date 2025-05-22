@@ -1,0 +1,124 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Onchain Quality Assessment Rule
+
+## Purpose
+Evaluate the quality and meaningfulness of on-chain interactions in NEAR Protocol projects, focusing on transaction quality, verification, and impact.
+
+## Evaluation Criteria
+
+### Transaction Quality (7 points)
+- Transaction purpose
+- Implementation quality
+- Error handling
+- Gas efficiency
+- State management
+
+### Verification (6 points)
+- Code verification
+- Live usage verification
+- Test coverage
+- Security measures
+- Documentation
+
+### Impact (7 points)
+- User experience impact
+- State impact
+- Core functionality
+- Performance
+- Scalability
+
+## Scoring Guidelines
+
+### High Quality (16-20 points)
+- Real, meaningful interactions
+- Verified through code and usage
+- Significant impact
+- Well-implemented
+- Thoroughly tested
+
+### Moderate Quality (10-15 points)
+- Useful transactions
+- Basic verification
+- Moderate impact
+- Standard implementation
+- Basic testing
+
+### Low Quality (0-9 points)
+- Superficial transactions
+- Limited verification
+- Minimal impact
+- Poor implementation
+- Insufficient testing
+
+## Implementation Checklist
+
+### Transaction Review
+- [ ] Purpose analysis
+- [ ] Implementation check
+- [ ] Error handling review
+- [ ] Gas efficiency
+- [ ] State management
+
+### Verification Check
+- [ ] Code verification
+- [ ] Usage verification
+- [ ] Test coverage
+- [ ] Security review
+- [ ] Documentation check
+
+### Impact Assessment
+- [ ] User experience
+- [ ] State impact
+- [ ] Core functionality
+- [ ] Performance
+- [ ] Scalability
+
+## Best Practices
+
+### Transactions
+- Clear purpose
+- Quality implementation
+- Robust error handling
+- Gas optimization
+- Efficient state management
+
+### Verification
+- Code verification
+- Usage verification
+- Comprehensive testing
+- Security measures
+- Clear documentation
+
+### Impact
+- Positive user experience
+- Meaningful state changes
+- Core functionality
+- Good performance
+- Scalable design
+
+## Common Issues
+
+### Transactions
+- Unclear purpose
+- Poor implementation
+- Weak error handling
+- High gas usage
+- State management issues
+
+### Verification
+- Limited verification
+- Insufficient testing
+- Security vulnerabilities
+- Poor documentation
+- Unverified usage
+
+### Impact
+- Poor user experience
+- Minimal state impact
+- Weak functionality
+- Performance issues
+- Scalability problems

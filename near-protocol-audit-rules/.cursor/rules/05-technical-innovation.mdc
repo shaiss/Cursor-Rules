@@ -1,0 +1,138 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Technical Innovation Assessment Rule
+
+## Purpose
+Evaluate the technical innovation and uniqueness of NEAR Protocol projects, focusing on novel solutions, technical advancement, and unique approaches to problem-solving.
+
+## Evaluation Criteria
+
+### Novelty (5 points)
+- Unique technical approach
+- Innovative problem-solving
+- Original implementation
+- Creative architecture
+- Novel use of technology
+
+### Technical Advancement (5 points)
+- State-of-the-art implementation
+- Advanced technical features
+- Complex problem solving
+- Technical sophistication
+- Engineering excellence
+
+### Implementation Quality (5 points)
+- Solution completeness
+- Technical robustness
+- Implementation elegance
+- Code quality
+- Performance optimization
+
+## Scoring Guidelines
+
+### High Innovation (12-15 points)
+- Highly novel solution
+- Advances state-of-the-art
+- Complex technical implementation
+- Elegant problem-solving
+- Professional-grade quality
+
+### Moderate Innovation (7-11 points)
+- Some innovative elements
+- Derivative model with improvements
+- Solid technical implementation
+- Good problem-solving
+- Quality implementation
+
+### Basic Innovation (0-6 points)
+- Little to no innovation
+- Standard implementation
+- Basic problem-solving
+- Minimal technical advancement
+- Basic quality
+
+## Implementation Checklist
+
+### Novelty Assessment
+- [ ] Technical approach evaluation
+- [ ] Problem-solving analysis
+- [ ] Implementation originality
+- [ ] Architecture innovation
+- [ ] Technology usage review
+
+### Technical Review
+- [ ] State-of-the-art analysis
+- [ ] Feature complexity assessment
+- [ ] Problem-solving evaluation
+- [ ] Technical sophistication check
+- [ ] Engineering quality review
+
+### Implementation Analysis
+- [ ] Solution completeness check
+- [ ] Technical robustness review
+- [ ] Implementation elegance assessment
+- [ ] Code quality evaluation
+- [ ] Performance analysis
+
+## Best Practices
+
+### Innovation
+- Focus on unique solutions
+- Consider novel approaches
+- Think outside conventional patterns
+- Maintain technical feasibility
+- Document innovative aspects
+
+### Technical
+- Use advanced techniques appropriately
+- Implement robust solutions
+- Ensure maintainability
+- Consider scalability
+- Optimize performance
+
+### Implementation
+- Follow best practices
+- Maintain code quality
+- Ensure proper testing
+- Document thoroughly
+- Consider edge cases
+
+## Common Issues
+
+### Innovation
+- Lack of originality
+- Poor technical choices
+- Insufficient problem-solving
+- Weak architecture
+- Inadequate documentation
+
+### Technical
+- Over-complexity
+- Poor implementation
+- Insufficient testing
+- Performance issues
+- Security vulnerabilities
+
+### Implementation
+- Incomplete solutions
+- Poor code quality
+- Insufficient documentation
+- Lack of testing
+- Performance bottlenecks
+
+## Reference Materials
+
+### NEAR Protocol Patterns
+For standard implementation patterns to compare against when evaluating innovation, see `supplementary-near-patterns.mdc`, which contains:
+- Standard NEAR function signatures and patterns
+- Common integration approaches
+- Baseline implementation techniques for comparison
+
+### NEAR Protocol Vulnerabilities
+For security and architecture considerations, see `supplementary-near-vulnerabilities.mdc`, which contains:
+- NEAR-specific architecture patterns
+- Common implementation approaches
+- Security considerations that may impact technical innovation assessment
