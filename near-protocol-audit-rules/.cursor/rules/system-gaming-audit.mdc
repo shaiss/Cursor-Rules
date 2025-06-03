@@ -1,0 +1,197 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# System Gaming Audit Rules
+
+## Overview
+These rules guide comprehensive audits to detect artificial activity, commit gaming, and false contribution inflation in software development teams.
+
+## 🔍 Audit Methodology
+
+### 1. Commit Pattern Analysis
+
+#### Red Flags to Investigate:
+- **Rapid commit sequences**: Multiple substantial commits within minutes
+- **Identical commit messages**: Generic messages like "fix: components fixed" repeated
+- **Unrealistic timing**: Complex changes committed too quickly for human development
+- **Batch commit patterns**: Long periods of silence followed by rapid-fire commits
+
+#### Git Commands for Analysis:
+```bash
+# Check commit timing patterns
+git log --pretty=format:"%h - %an, %ad : %s" --date=format:"%Y-%m-%d %H:%M:%S" <range>
+
+# Analyze commit frequency by author
+git log --author="<name>" --pretty=format:"%ad" --date=short | sort | uniq -c
+
+# Check for identical commit messages
+git log --pretty=format:"%s" | sort | uniq -c | sort -nr
+```
+
+### 2. Pull Request Structure Evaluation
+
+#### Legitimate vs Suspicious PR Patterns:
+
+**🚩 SUSPICIOUS:**
+- Multiple PRs with identical file counts and line changes
+- Sequential branches presented as independent features  
+- PRs created minutes apart targeting same base commit
+- Large features artificially split without logical boundaries
+
+**✅ LEGITIMATE:**
+- PRs split by functional domain (frontend/backend, feature areas)
+- Different file sets and meaningful line count variations
+- Clear business justification for separate PRs
+
+#### Verification Commands:
+```bash
+# Compare PR base commits and file changes
+git diff --shortstat <base>..<branch1>
+git diff --shortstat <base>..<branch2>
+
+# Check branch relationships
+git log --oneline --graph <range>
+
+# Verify merge bases
+git merge-base main <branch>
+```
+
+### 3. Code Authenticity Verification
+
+#### What to Check:
+- **Real functionality**: Does code serve actual business purposes?
+- **Code quality**: Is it copy-paste, generated, or thoughtfully written?
+- **File content**: Substantial vs trivial changes
+- **Logical progression**: Do commits build coherently?
+
+#### Spot Check Commands:
+```bash
+# Review actual file changes
+git show --stat <commit>
+git show --name-only <commit>
+
+# Check for duplicate code patterns
+git log --follow <file>
+
+# Analyze line change distribution
+git diff --numstat <range>
+```
+
+### 4. Development Velocity Analysis
+
+#### Realistic Productivity Benchmarks:
+- **React component**: 50-200 lines (30-60 min)
+- **API service**: 200-500 lines (60-120 min)
+- **Complex feature**: 1000+ lines (multiple hours/days)
+- **Documentation**: 100-300 lines (30-90 min)
+
+#### Volume vs Time Sanity Checks:
+- More than 500 lines/hour sustained = investigate
+- Complex features in <30 minutes = suspicious
+- Multiple unrelated changes simultaneously = batch commit likely
+
+### 5. Gaming System Indicators
+
+#### 🚨 DEFINITIVE RED FLAGS:
+- Empty commits with no functional changes
+- File additions/deletions with no content impact
+- Artificial issue creation without substance
+- Copy-paste duplicate code across repos
+- Whitespace-only changes for activity padding
+
+#### ⚠️ PROCESS CONCERNS (Not Gaming):
+- Poor commit message quality
+- Batch committing legitimate work
+- Suboptimal PR breakdown
+- Lack of code review
+
+### 6. Tool Reliability Verification
+
+#### Always Cross-Reference:
+- GitHub API data vs local git analysis
+- MCP server responses vs direct GitHub interface
+- Automated tool reports vs manual verification
+
+#### Trust Hierarchy:
+1. **Local git commands** (most reliable)
+2. **GitHub web interface** (primary source)
+3. **GitHub API direct calls** (generally reliable)
+4. **Third-party tools/MCPs** (verify independently)
+
+## 🎯 Investigation Protocol
+
+### Phase 1: Initial Screening
+```bash
+# Get recent PR overview
+git log --grep="Merge pull request" --oneline -10
+
+# Check for timing anomalies
+git log --pretty=format:"%h - %an, %ad : %s" --date=format:"%H:%M:%S" -20
+
+# Identify commit message patterns
+git log --pretty=format:"%s" -50 | sort | uniq -c | sort -nr
+```
+
+### Phase 2: Deep Dive (If Red Flags Found)
+```bash
+# Analyze specific contributor
+git log --author="<name>" --stat --since="1 month ago"
+
+# Compare claimed vs actual changes
+git diff --shortstat <base>..<branch>
+
+# Check branch structure
+git log --oneline --graph --all -20
+```
+
+### Phase 3: Content Verification
+```bash
+# Spot check file contents
+git show <commit>:<file>
+
+# Track file evolution
+git log --follow -p <file>
+
+# Verify no dummy content
+git diff --check <range>
+```
+
+## 📋 Audit Report Template
+
+### Executive Summary
+- **Assessment Period**: [timeframe]
+- **Contributors Analyzed**: [names]
+- **Verdict**: [Clear conclusion]
+
+### Findings Categories
+1. **Commit Quality Analysis**
+2. **PR Structure Evaluation** 
+3. **Work Authenticity Verification**
+4. **Development Velocity Analysis**
+5. **Gaming System Indicators**
+
+### Recommendations
+- **Process Improvements**: [specific actions]
+- **Monitoring**: [ongoing practices]
+- **Action Required**: [immediate steps]
+
+## ⚖️ Ethical Guidelines
+
+### DO:
+- Focus on patterns and processes
+- Verify data independently
+- Consider legitimate explanations
+- Protect team morale during investigation
+
+### DON'T:
+- Make accusations without solid evidence
+- Rely solely on automated tools
+- Punish legitimate intensive work periods
+- Create hostile work environment
+
+### Remember:
+Bad process habits ≠ Malicious gaming
+Tool errors ≠ Developer misconduct
+Investigate thoroughly before conclusions

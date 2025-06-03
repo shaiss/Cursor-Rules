@@ -1,0 +1,160 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Quick Audit Commands Reference
+
+## 🚀 Rapid Gaming Detection Commands
+
+### 1-Minute Health Check
+```bash
+# Get recent activity overview
+git log --oneline -20
+
+# Check for suspicious timing patterns
+git log --pretty=format:"%an %ad %s" --date=format:"%H:%M" -20 | grep -E "(00:|01:|02:|03:|04:|05:)"
+
+# Find repetitive commit messages
+git log --pretty=format:"%s" -50 | sort | uniq -c | sort -nr | head -10
+```
+
+### 5-Minute Deep Scan
+```bash
+# Analyze specific developer (replace <author>)
+git log --author="<author>" --pretty=format:"%ad %s" --date=format:"%m/%d %H:%M" --since="2 weeks ago"
+
+# Check PR merge patterns
+git log --grep="Merge pull request" --pretty=format:"%ad %s" --date=format:"%m/%d %H:%M" -10
+
+# Verify commit-to-change ratios
+git log --stat --since="1 week ago" | grep -E "(files? changed|Author:)"
+```
+
+### Suspicious Pattern Detection
+```bash
+# Find commits made in rapid succession (< 5 minutes apart)
+git log --pretty=format:"%at %an %s" --since="1 month ago" | sort -n | awk '{
+  if (prev && $1 - prev < 300 && $2 == prev_author) {
+    print "RAPID: " strftime("%Y-%m-%d %H:%M", prev) " -> " strftime("%Y-%m-%d %H:%M", $1) " by " $2
+  }
+  prev = $1; prev_author = $2
+}'
+
+# Check for artificial PR splitting
+git branch -r | grep -E "(modif|fix|temp|test)" | head -10
+```
+
+## 🔍 File-Level Gaming Detection
+
+### Empty/Trivial Commit Check
+```bash
+# Find commits with minimal changes
+git log --pretty=format:"%h %s" --shortstat --since="1 month ago" | grep -B1 -A1 "1 file.*1 insertion.*1 deletion"
+
+# Check for whitespace-only changes
+git log --check --since="1 month ago"
+
+# Find commits that only modify formatting
+git log -p --since="1 week ago" | grep -B5 -A5 "^-[ \t]*$\|^+[ \t]*$"
+```
+
+### Duplicate Content Detection
+```bash
+# Check for copy-paste across files
+find . -name "*.js" -o -name "*.jsx" -o -name "*.ts" -o -name "*.tsx" | xargs md5sum | sort | uniq -d -w 32
+
+# Look for suspiciously similar commit diffs
+git log --pretty=format:"%H" --since="1 month ago" | head -20 | xargs -I {} git show --stat {} | grep "files changed" | sort | uniq -c | sort -nr
+```
+
+## 📊 Velocity Analysis
+
+### Line Count Reality Check
+```bash
+# Calculate lines per hour by author
+git log --author="<author>" --pretty=format:"%at" --numstat --since="1 week ago" | awk '
+/^[0-9]/ { time = $1; next }
+/^[0-9]+.*/ { added += $1; deleted += $2 }
+END { 
+  hours = (systime() - time) / 3600
+  print "Lines/hour: " (added + deleted) / hours
+}'
+
+# Find suspiciously large commits
+git log --pretty=format:"%h %an %s" --shortstat --since="1 month ago" | grep -B1 "insertions.*deletions" | grep -E "[0-9]{4,}"
+```
+
+### Contribution Pattern Analysis
+```bash
+# Check commit distribution by hour of day
+git log --pretty=format:"%ad" --date=format:"%H" --since="1 month ago" | sort | uniq -c
+
+# Find weekend/late night commit sprees
+git log --pretty=format:"%ad %an" --date=format:"%a %H:%M" --since="1 month ago" | grep -E "(Sat|Sun|0[0-5]:|2[2-3]:)"
+```
+
+## 🚨 Red Flag Alerting
+
+### Automated Red Flag Detection
+```bash
+# Generate red flag report
+echo "=== RED FLAG REPORT ===" > audit_report.txt
+echo "Generated: $(date)" >> audit_report.txt
+echo "" >> audit_report.txt
+
+# Check for rapid commits
+echo "RAPID COMMITS (< 5 min apart):" >> audit_report.txt
+git log --pretty=format:"%at %an %s" --since="2 weeks ago" | sort -n | awk '{
+  if (prev && $1 - prev < 300 && $2 == prev_author) {
+    print "⚠️  " strftime("%m/%d %H:%M", prev) " -> " strftime("%H:%M", $1) " by " $2
+  }
+  prev = $1; prev_author = $2
+}' >> audit_report.txt
+
+# Check for repetitive messages
+echo "" >> audit_report.txt
+echo "REPETITIVE COMMIT MESSAGES:" >> audit_report.txt
+git log --pretty=format:"%s" --since="2 weeks ago" | sort | uniq -c | sort -nr | head -5 | awk '$1 > 3 {print "⚠️  " $1 "x: " substr($0, index($0,$2))}' >> audit_report.txt
+
+cat audit_report.txt
+```
+
+## 🎯 GitHub API Cross-Reference
+
+### Verify Against GitHub Data
+```bash
+# Check if local git matches GitHub (requires gh CLI)
+gh pr list --state merged --limit 10 --json number,additions,deletions,changedFiles
+
+# Compare with local analysis
+git log --grep="Merge pull request #" --oneline -10 | while read line; do
+  pr_num=$(echo $line | grep -o "#[0-9]*" | cut -c2-)
+  echo "PR #$pr_num local vs GitHub comparison needed"
+done
+```
+
+## ⚡ Quick Decision Matrix
+
+### Gaming Indicators Severity
+```
+🔴 CRITICAL (Investigate Immediately):
+- Empty commits with activity timestamps
+- Identical PRs with same file counts
+- 10+ commits in 30 minutes with substantial changes
+- Copy-paste code across multiple repos
+
+🟡 WARNING (Review Process):
+- Generic commit messages (>50% of commits)
+- Batch commits after long silence periods  
+- Large PRs (>1000 lines) without justification
+- No code review on substantial changes
+
+🟢 ACCEPTABLE (Monitor):
+- Intensive legitimate work periods
+- Poor commit message quality
+- Suboptimal PR organization
+- Tool/environment issues
+```
+
+Use [system-gaming-audit.mdc](mdc:system-gaming-audit.mdc) for comprehensive audit methodology.

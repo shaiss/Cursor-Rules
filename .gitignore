@@ -17,4 +17,5 @@ __MACOSX/
 !*/
 !*.md
 !*.mdc
-!.gitignore 
+!.gitignore
+!*.sh
