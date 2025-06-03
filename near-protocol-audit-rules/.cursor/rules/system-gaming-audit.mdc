@@ -8,6 +8,46 @@ alwaysApply: false
 ## Overview
 These rules guide comprehensive audits to detect artificial activity, commit gaming, and false contribution inflation in software development teams.
 
+## 🚨 MANDATORY: Audit Session Setup
+
+### Pre-Audit Initialization (REQUIRED)
+```bash
+# 1. Create timestamped audit directory
+AUDIT_SESSION="audit_$(date +%Y%m%d_%H%M%S)_$(git rev-parse --short HEAD)"
+mkdir -p "$AUDIT_SESSION"
+cd "$AUDIT_SESSION"
+
+# 2. Initialize audit log with environment context
+exec > >(tee audit.log) 2>&1
+
+echo "=== AUDIT SESSION INITIALIZATION ==="
+echo "Session ID: $AUDIT_SESSION"
+echo "Date/Time: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+echo "Auditor: $(whoami)@$(hostname)"
+echo "Working Directory: $(pwd)"
+echo "Git Repository: $(git remote get-url origin 2>/dev/null || echo 'Local only')"
+echo "Git Branch: $(git branch --show-current)"
+echo "Git Status: $(git status --porcelain | wc -l) uncommitted changes"
+echo "================================="
+
+# 3. Create evidence directories
+mkdir -p evidence/{api_responses,git_analysis,script_outputs,samples,verification}
+```
+
+### Command Logging (MANDATORY)
+```bash
+# Function to log all git commands
+git_logged() {
+    echo "GIT_CMD: git $*" | tee -a git_commands.log
+    git "$@" 2>&1 | tee -a git_output.log
+    echo "GIT_EXIT: $?" | tee -a git_commands.log
+    echo "---" | tee -a git_commands.log
+}
+
+# Use git_logged instead of git for all audit commands
+alias git=git_logged
+```
+
 ## 🔍 Audit Methodology
 
 ### 1. Commit Pattern Analysis
@@ -18,16 +58,16 @@ These rules guide comprehensive audits to detect artificial activity, commit gam
 - **Unrealistic timing**: Complex changes committed too quickly for human development
 - **Batch commit patterns**: Long periods of silence followed by rapid-fire commits
 
-#### Git Commands for Analysis:
+#### Git Commands for Analysis (WITH LOGGING):
 ```bash
 # Check commit timing patterns
-git log --pretty=format:"%h - %an, %ad : %s" --date=format:"%Y-%m-%d %H:%M:%S" <range>
+git_logged log --pretty=format:"%h - %an, %ad : %s" --date=format:"%Y-%m-%d %H:%M:%S" <range> | tee evidence/git_analysis/timing_patterns.log
 
 # Analyze commit frequency by author
-git log --author="<name>" --pretty=format:"%ad" --date=short | sort | uniq -c
+git_logged log --author="<name>" --pretty=format:"%ad" --date=short | sort | uniq -c | tee evidence/git_analysis/author_frequency.log
 
 # Check for identical commit messages
-git log --pretty=format:"%s" | sort | uniq -c | sort -nr
+git_logged log --pretty=format:"%s" | sort | uniq -c | sort -nr | tee evidence/git_analysis/message_patterns.log
 ```
 
 ### 2. Pull Request Structure Evaluation
@@ -45,17 +85,17 @@ git log --pretty=format:"%s" | sort | uniq -c | sort -nr
 - Different file sets and meaningful line count variations
 - Clear business justification for separate PRs
 
-#### Verification Commands:
+#### Verification Commands (WITH EVIDENCE PRESERVATION):
 ```bash
 # Compare PR base commits and file changes
-git diff --shortstat <base>..<branch1>
-git diff --shortstat <base>..<branch2>
+git_logged diff --shortstat <base>..<branch1> | tee evidence/git_analysis/pr_comparison_1.log
+git_logged diff --shortstat <base>..<branch2> | tee evidence/git_analysis/pr_comparison_2.log
 
 # Check branch relationships
-git log --oneline --graph <range>
+git_logged log --oneline --graph <range> | tee evidence/git_analysis/branch_relationships.log
 
 # Verify merge bases
-git merge-base main <branch>
+git_logged merge-base main <branch> | tee evidence/git_analysis/merge_bases.log
 ```
 
 ### 3. Code Authenticity Verification
@@ -66,17 +106,20 @@ git merge-base main <branch>
 - **File content**: Substantial vs trivial changes
 - **Logical progression**: Do commits build coherently?
 
-#### Spot Check Commands:
+#### Spot Check Commands (WITH SAMPLING):
 ```bash
-# Review actual file changes
-git show --stat <commit>
-git show --name-only <commit>
+# Review actual file changes and preserve samples
+git_logged show --stat <commit> | tee evidence/git_analysis/commit_${commit}_stat.log
+git_logged show --name-only <commit> | tee evidence/git_analysis/commit_${commit}_files.log
+
+# Preserve file content samples
+git show <commit>:<file> > evidence/samples/commit_${commit}_$(basename $file)
 
 # Check for duplicate code patterns
-git log --follow <file>
+git_logged log --follow <file> | tee evidence/git_analysis/file_evolution_$(basename $file).log
 
 # Analyze line change distribution
-git diff --numstat <range>
+git_logged diff --numstat <range> | tee evidence/git_analysis/line_distribution.log
 ```
 
 ### 4. Development Velocity Analysis
@@ -87,10 +130,14 @@ git diff --numstat <range>
 - **Complex feature**: 1000+ lines (multiple hours/days)
 - **Documentation**: 100-300 lines (30-90 min)
 
-#### Volume vs Time Sanity Checks:
-- More than 500 lines/hour sustained = investigate
-- Complex features in <30 minutes = suspicious
-- Multiple unrelated changes simultaneously = batch commit likely
+#### Volume vs Time Sanity Checks (WITH CALCULATIONS):
+```bash
+# Calculate and log velocity metrics
+echo "VELOCITY_ANALYSIS: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" | tee evidence/git_analysis/velocity_analysis.log
+echo "Lines/minute threshold: >1.4 = investigate" | tee -a evidence/git_analysis/velocity_analysis.log
+echo "Complex features <30min = suspicious" | tee -a evidence/git_analysis/velocity_analysis.log
+echo "Multiple unrelated changes = batch likely" | tee -a evidence/git_analysis/velocity_analysis.log
+```
 
 ### 5. Gaming System Indicators
 
@@ -107,12 +154,25 @@ git diff --numstat <range>
 - Suboptimal PR breakdown
 - Lack of code review
 
-### 6. Tool Reliability Verification
+### 6. Tool Reliability Verification (WITH CROSS-CHECKS)
 
-#### Always Cross-Reference:
-- GitHub API data vs local git analysis
-- MCP server responses vs direct GitHub interface
-- Automated tool reports vs manual verification
+#### Always Cross-Reference and Log:
+```bash
+# Document verification steps
+verify_and_log() {
+    local verification_type="$1"
+    local primary_source="$2"  
+    local secondary_source="$3"
+    local result="$4"
+    
+    echo "VERIFICATION: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" | tee -a evidence/verification/verification.log
+    echo "Type: $verification_type" | tee -a evidence/verification/verification.log
+    echo "Primary: $primary_source" | tee -a evidence/verification/verification.log
+    echo "Secondary: $secondary_source" | tee -a evidence/verification/verification.log
+    echo "Result: $result" | tee -a evidence/verification/verification.log
+    echo "---" | tee -a evidence/verification/verification.log
+}
+```
 
 #### Trust Hierarchy:
 1. **Local git commands** (most reliable)
@@ -122,40 +182,51 @@ git diff --numstat <range>
 
 ## 🎯 Investigation Protocol
 
-### Phase 1: Initial Screening
+### Phase 1: Initial Screening (WITH LOGGING)
 ```bash
+# Log decision to start investigation
+echo "DECISION_POINT: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" | tee decisions.log
+echo "Decision: Starting initial screening" | tee -a decisions.log
+echo "Reasoning: [specify reason]" | tee -a decisions.log
+
 # Get recent PR overview
-git log --grep="Merge pull request" --oneline -10
+git_logged log --grep="Merge pull request" --oneline -10 | tee evidence/git_analysis/recent_prs.log
 
 # Check for timing anomalies
-git log --pretty=format:"%h - %an, %ad : %s" --date=format:"%H:%M:%S" -20
+git_logged log --pretty=format:"%h - %an, %ad : %s" --date=format:"%H:%M:%S" -20 | tee evidence/git_analysis/timing_anomalies.log
 
 # Identify commit message patterns
-git log --pretty=format:"%s" -50 | sort | uniq -c | sort -nr
+git_logged log --pretty=format:"%s" -50 | sort | uniq -c | sort -nr | tee evidence/git_analysis/message_patterns.log
 ```
 
 ### Phase 2: Deep Dive (If Red Flags Found)
 ```bash
+# Document pattern discovery
+echo "PATTERN_DISCOVERY: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" | tee -a patterns.log
+echo "Type: [pattern type]" | tee -a patterns.log
+echo "Evidence: [evidence found]" | tee -a patterns.log
+echo "Confidence: [High/Medium/Low]" | tee -a patterns.log
+
 # Analyze specific contributor
-git log --author="<name>" --stat --since="1 month ago"
+git_logged log --author="<name>" --stat --since="1 month ago" | tee evidence/git_analysis/contributor_analysis.log
 
 # Compare claimed vs actual changes
-git diff --shortstat <base>..<branch>
+git_logged diff --shortstat <base>..<branch> | tee evidence/git_analysis/change_comparison.log
 
 # Check branch structure
-git log --oneline --graph --all -20
+git_logged log --oneline --graph --all -20 | tee evidence/git_analysis/branch_structure.log
 ```
 
-### Phase 3: Content Verification
+### Phase 3: Content Verification (WITH SAMPLES)
 ```bash
-# Spot check file contents
-git show <commit>:<file>
+# Spot check file contents and preserve
+git_logged show <commit>:<file> | tee evidence/samples/content_sample_$(date +%H%M%S).log
 
 # Track file evolution
-git log --follow -p <file>
+git_logged log --follow -p <file> | tee evidence/git_analysis/file_evolution.log
 
 # Verify no dummy content
-git diff --check <range>
+git_logged diff --check <range> | tee evidence/git_analysis/dummy_content_check.log
 ```
 
 ## 📋 Audit Report Template
@@ -163,6 +234,7 @@ git diff --check <range>
 ### Executive Summary
 - **Assessment Period**: [timeframe]
 - **Contributors Analyzed**: [names]
+- **Session ID**: $AUDIT_SESSION
 - **Verdict**: [Clear conclusion]
 
 ### Findings Categories
@@ -172,26 +244,71 @@ git diff --check <range>
 4. **Development Velocity Analysis**
 5. **Gaming System Indicators**
 
+### Evidence References
+- **Audit Log**: audit.log
+- **Git Analysis**: evidence/git_analysis/
+- **Verification Records**: evidence/verification/
+- **File Samples**: evidence/samples/
+- **API Responses**: evidence/api_responses/
+
 ### Recommendations
 - **Process Improvements**: [specific actions]
 - **Monitoring**: [ongoing practices]
 - **Action Required**: [immediate steps]
 
+## 🏁 Session Finalization (MANDATORY)
+
+### Complete Audit Session
+```bash
+# Generate session summary
+generate_session_summary() {
+    echo "=== AUDIT SESSION SUMMARY ===" > session_summary.md
+    echo "**Session ID:** $AUDIT_SESSION" >> session_summary.md
+    echo "**Duration:** [start] - $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> session_summary.md
+    echo "**Evidence Files:** $(find evidence/ -type f | wc -l)" >> session_summary.md
+    echo "**Commands Executed:** $(wc -l < git_commands.log)" >> session_summary.md
+    echo "**Key Findings:** [To be filled]" >> session_summary.md
+}
+
+# Finalize and archive
+finalize_audit() {
+    generate_session_summary
+    cd ..
+    tar -czf "${AUDIT_SESSION}.tar.gz" "$AUDIT_SESSION"
+    sha256sum "${AUDIT_SESSION}.tar.gz" > "${AUDIT_SESSION}.sha256"
+    echo "Audit archived: ${AUDIT_SESSION}.tar.gz"
+    echo "Checksum: $(cat ${AUDIT_SESSION}.sha256)"
+}
+```
+
 ## ⚖️ Ethical Guidelines
 
 ### DO:
 - Focus on patterns and processes
-- Verify data independently
+- Verify data independently with cross-checks
 - Consider legitimate explanations
 - Protect team morale during investigation
+- **PRESERVE ALL AUDIT EVIDENCE**
 
 ### DON'T:
 - Make accusations without solid evidence
 - Rely solely on automated tools
 - Punish legitimate intensive work periods
 - Create hostile work environment
+- **LOSE AUDIT TRAIL DATA**
 
 ### Remember:
-Bad process habits ≠ Malicious gaming
-Tool errors ≠ Developer misconduct
-Investigate thoroughly before conclusions
+- Bad process habits ≠ Malicious gaming
+- Tool errors ≠ Developer misconduct  
+- Investigate thoroughly before conclusions
+- **DOCUMENT EVERYTHING - EVIDENCE IS CRITICAL**
+
+## 📊 Post-Audit Learning
+
+### Update This Rule Based On:
+- New gaming patterns discovered
+- Tool reliability issues found
+- Process gaps identified
+- Evidence preservation improvements needed
+
+See [enhanced-audit-logging.mdc](mdc:enhanced-audit-logging.mdc) for detailed logging protocol.

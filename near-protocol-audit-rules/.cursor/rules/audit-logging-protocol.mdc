@@ -1,0 +1,359 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Audit Logging Protocol
+
+## Overview
+Critical logging requirements discovered from PRs 234-247 audit where original audit logs were not preserved, limiting evidence traceability and investigation credibility.
+
+## 🚨 MANDATORY: Every Audit Session
+
+### Session Initialization (NEVER SKIP)
+```bash
+# 1. Create timestamped audit directory
+AUDIT_SESSION="audit_$(date +%Y%m%d_%H%M%S)_$(git rev-parse --short HEAD)"
+mkdir -p "$AUDIT_SESSION"
+cd "$AUDIT_SESSION"
+
+# 2. Initialize comprehensive logging
+exec > >(tee audit.log) 2>&1
+
+echo "=== AUDIT SESSION INITIALIZATION ==="
+echo "Session ID: $AUDIT_SESSION"
+echo "Date/Time: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+echo "Auditor: $(whoami)@$(hostname)"
+echo "Working Directory: $(pwd)"
+echo "Git Repository: $(git remote get-url origin 2>/dev/null || echo 'Local only')"
+echo "Git Branch: $(git branch --show-current)"
+echo "Git Status: $(git status --porcelain | wc -l) uncommitted changes"
+echo "Tool Versions:"
+echo "  Git: $(git --version)"
+echo "  Shell: $SHELL ($BASH_VERSION)"
+echo "  OS: $(uname -a)"
+echo "================================="
+
+# 3. Create evidence structure
+mkdir -p evidence/{api_responses,git_analysis,script_outputs,samples,verification}
+mkdir -p logs/{commands,decisions,patterns,verification}
+```
+
+## 📝 Command Logging (MANDATORY)
+
+### Git Command Wrapper (ALWAYS USE)
+```bash
+# Function to log ALL git commands
+git_logged() {
+    local timestamp=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+    echo "GIT_CMD [$timestamp]: git $*" | tee -a logs/commands/git_commands.log
+    git "$@" 2>&1 | tee -a logs/commands/git_output.log
+    local exit_code=$?
+    echo "GIT_EXIT [$timestamp]: $exit_code" | tee -a logs/commands/git_commands.log
+    echo "---" | tee -a logs/commands/git_commands.log
+    return $exit_code
+}
+
+# Replace git with logged version for ALL audit commands
+alias git=git_logged
+```
+
+### API Call Logging (FOR ALL EXTERNAL CALLS)
+```bash
+# Function to log API/MCP calls
+api_logged() {
+    local call_type="$1"
+    local params="$2"
+    local timestamp=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+    
+    echo "API_CALL [$timestamp]: $call_type" | tee -a logs/commands/api_calls.log
+    echo "PARAMS: $params" | tee -a logs/commands/api_calls.log
+    
+    # Execute actual call (implement based on your API tools)
+    # Save response to evidence/api_responses/
+    
+    echo "API_COMPLETE [$timestamp]" | tee -a logs/commands/api_calls.log
+    echo "---" | tee -a logs/commands/api_calls.log
+}
+```
+
+### Script Execution Logging (FOR ALL ANALYSIS SCRIPTS)
+```bash
+# Function to log script executions
+script_logged() {
+    local script_name="$1"
+    shift
+    local script_args="$*"
+    local timestamp=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+    
+    echo "SCRIPT_START [$timestamp]: $script_name $script_args" | tee -a logs/commands/script_execution.log
+    
+    # Execute script and capture ALL output
+    ./"$script_name" $script_args 2>&1 | tee "evidence/script_outputs/${script_name}_$(date +%H%M%S).log"
+    local exit_code=$?
+    
+    echo "SCRIPT_END [$timestamp]: Exit $exit_code" | tee -a logs/commands/script_execution.log
+    echo "---" | tee -a logs/commands/script_execution.log
+    return $exit_code
+}
+```
+
+## 🧠 Decision and Pattern Logging (CRITICAL)
+
+### Decision Point Documentation (EVERY MAJOR DECISION)
+```bash
+# Log critical decision points
+log_decision() {
+    local decision="$1"
+    local reasoning="$2"
+    local alternatives="$3"
+    local timestamp=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+    
+    echo "DECISION_POINT [$timestamp]" | tee -a logs/decisions/decisions.log
+    echo "Decision: $decision" | tee -a logs/decisions/decisions.log
+    echo "Reasoning: $reasoning" | tee -a logs/decisions/decisions.log
+    echo "Alternatives Considered: $alternatives" | tee -a logs/decisions/decisions.log
+    echo "---" | tee -a logs/decisions/decisions.log
+}
+
+# Usage example:
+# log_decision "Investigating PRs 234-247" "Suspicious timing patterns observed" "Could investigate broader range or focus on specific author"
+```
+
+### Pattern Discovery Logging (EVERY FINDING)
+```bash
+# Log pattern discoveries with evidence
+log_pattern() {
+    local pattern_type="$1"
+    local evidence="$2"
+    local confidence="$3"
+    local implications="$4"
+    local timestamp=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+    
+    echo "PATTERN_DISCOVERY [$timestamp]" | tee -a logs/patterns/patterns.log
+    echo "Type: $pattern_type" | tee -a logs/patterns/patterns.log
+    echo "Evidence: $evidence" | tee -a logs/patterns/patterns.log
+    echo "Confidence: $confidence" | tee -a logs/patterns/patterns.log
+    echo "Implications: $implications" | tee -a logs/patterns/patterns.log
+    echo "---" | tee -a logs/patterns/patterns.log
+}
+
+# Usage example:
+# log_pattern "Sequential duplication" "10 PRs in 31 minutes with incremental content" "High" "Potential systematic gaming"
+```
+
+## 🔬 Evidence Preservation (NEVER LOSE DATA)
+
+### File Content Sampling (PRESERVE EXAMPLES)
+```bash
+# Save file content samples
+save_file_sample() {
+    local file_path="$1"
+    local context="$2"
+    local timestamp=$(date +%H%M%S)
+    
+    cp "$file_path" "evidence/samples/${context}_$(basename $file_path)_${timestamp}"
+    echo "SAMPLE_SAVED [$timestamp]: $file_path ($context)" | tee -a evidence/evidence.log
+}
+
+# Save git object content
+save_git_content() {
+    local commit="$1"
+    local file_path="$2"
+    local context="$3"
+    local timestamp=$(date +%H%M%S)
+    
+    git show "${commit}:${file_path}" > "evidence/samples/${context}_${commit}_$(basename $file_path)_${timestamp}"
+    echo "GIT_CONTENT_SAVED [$timestamp]: ${commit}:${file_path} ($context)" | tee -a evidence/evidence.log
+}
+```
+
+### API Response Preservation (SAVE ALL RESPONSES)
+```bash
+# Save API responses with metadata
+save_api_response() {
+    local endpoint="$1"
+    local identifier="$2"
+    local response="$3"
+    local timestamp=$(date +%H%M%S)
+    
+    echo "$response" > "evidence/api_responses/${endpoint}_${identifier}_${timestamp}.json"
+    echo "API_RESPONSE_SAVED [$timestamp]: ${endpoint}_${identifier}" | tee -a evidence/evidence.log
+}
+```
+
+## ✅ Cross-Verification Documentation (TRUST BUT VERIFY)
+
+### Verification Step Logging (DOCUMENT ALL CHECKS)
+```bash
+# Document verification steps
+verify_and_log() {
+    local verification_type="$1"
+    local primary_source="$2"
+    local secondary_source="$3"
+    local result="$4"
+    local timestamp=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+    
+    echo "VERIFICATION [$timestamp]" | tee -a logs/verification/verification.log
+    echo "Type: $verification_type" | tee -a logs/verification/verification.log
+    echo "Primary: $primary_source" | tee -a logs/verification/verification.log
+    echo "Secondary: $secondary_source" | tee -a logs/verification/verification.log
+    echo "Result: $result" | tee -a logs/verification/verification.log
+    echo "---" | tee -a logs/verification/verification.log
+}
+
+# Usage example:
+# verify_and_log "Timestamp verification" "GitHub API response" "Local git" "Consistent - both show 23:37:46 UTC"
+```
+
+## 📊 Session Management (COMPLETE LIFECYCLE)
+
+### Session Progress Tracking
+```bash
+# Track audit progress
+log_progress() {
+    local phase="$1"
+    local status="$2"
+    local notes="$3"
+    local timestamp=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+    
+    echo "PROGRESS [$timestamp]: $phase - $status" | tee -a audit_progress.log
+    echo "Notes: $notes" | tee -a audit_progress.log
+    echo "---" | tee -a audit_progress.log
+}
+
+# Usage example:
+# log_progress "Initial screening" "COMPLETE" "Found 10 PRs with suspicious timing pattern"
+```
+
+### Session Finalization (MANDATORY COMPLETION)
+```bash
+# Generate comprehensive session summary
+finalize_audit_session() {
+    local start_time="$1"  # Pass in start time if available
+    local end_time=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+    
+    echo "=== AUDIT SESSION SUMMARY ===" > session_summary.md
+    echo "**Session ID:** $AUDIT_SESSION" >> session_summary.md
+    echo "**Start Time:** $start_time" >> session_summary.md
+    echo "**End Time:** $end_time" >> session_summary.md
+    echo "**Duration:** [Calculate if needed]" >> session_summary.md
+    echo "" >> session_summary.md
+    
+    echo "### Evidence Collected" >> session_summary.md
+    echo "- **Total Files:** $(find evidence/ -type f | wc -l)" >> session_summary.md
+    echo "- **Git Commands:** $(wc -l < logs/commands/git_commands.log 2>/dev/null || echo 0)" >> session_summary.md
+    echo "- **API Calls:** $(wc -l < logs/commands/api_calls.log 2>/dev/null || echo 0)" >> session_summary.md
+    echo "- **Decisions Logged:** $(grep -c "DECISION_POINT" logs/decisions/decisions.log 2>/dev/null || echo 0)" >> session_summary.md
+    echo "- **Patterns Found:** $(grep -c "PATTERN_DISCOVERY" logs/patterns/patterns.log 2>/dev/null || echo 0)" >> session_summary.md
+    echo "- **Verifications:** $(grep -c "VERIFICATION" logs/verification/verification.log 2>/dev/null || echo 0)" >> session_summary.md
+    
+    echo "" >> session_summary.md
+    echo "### Key Findings" >> session_summary.md
+    echo "*[To be filled by auditor based on investigation]*" >> session_summary.md
+    
+    # Create archive with integrity verification
+    cd ..
+    tar -czf "${AUDIT_SESSION}.tar.gz" "$AUDIT_SESSION"
+    sha256sum "${AUDIT_SESSION}.tar.gz" > "${AUDIT_SESSION}.sha256"
+    
+    echo "Audit session finalized and archived:"
+    echo "Archive: ${AUDIT_SESSION}.tar.gz"
+    echo "Checksum: $(cat ${AUDIT_SESSION}.sha256)"
+    
+    # Optional: Upload to secure storage
+    # upload_audit_archive "${AUDIT_SESSION}.tar.gz"
+}
+```
+
+## 🔍 Quality Assurance (VALIDATE COMPLETENESS)
+
+### Audit Log Validation
+```bash
+# Validate audit session completeness
+validate_audit_completeness() {
+    local required_files=(
+        "audit.log"
+        "logs/commands/git_commands.log"
+        "logs/decisions/decisions.log"
+        "logs/patterns/patterns.log" 
+        "evidence/evidence.log"
+        "session_summary.md"
+    )
+    
+    local missing_files=()
+    for file in "${required_files[@]}"; do
+        if [[ ! -f "$file" ]]; then
+            missing_files+=("$file")
+        fi
+    done
+    
+    if [ ${#missing_files[@]} -eq 0 ]; then
+        echo "✅ AUDIT VALIDATION: PASSED - All required files present"
+        return 0
+    else
+        echo "❌ AUDIT VALIDATION: FAILED - Missing files:"
+        printf '  - %s\n' "${missing_files[@]}"
+        return 1
+    fi
+}
+```
+
+## 🚀 Quick Implementation Template
+
+### Complete Audit Session Template
+```bash
+#!/bin/bash
+# Complete audit session following logging protocol
+
+# 1. Initialize session
+source .cursor/rules/audit-logging-protocol.mdc
+
+# 2. Log initial decision
+log_decision "Starting audit investigation" "Suspicious activity reported" "Could ignore or investigate immediately"
+
+# 3. Execute analysis with logging
+git_logged log --oneline --since="1 month ago"
+script_logged pr_overlap_detector.sh 234 247
+
+# 4. Document findings
+log_pattern "Sequential PR duplication" "10 PRs in 31 minutes" "High" "Requires immediate investigation"
+
+# 5. Preserve evidence
+save_api_response "github_pr" "234" "$pr_234_json"
+
+# 6. Cross-verify
+verify_and_log "PR metadata" "GitHub API" "Local git" "Consistent timestamps"
+
+# 7. Finalize session
+finalize_audit_session "$(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+```
+
+## 📋 Logging Checklist (EVERY AUDIT)
+
+- [ ] **Session initialized** with timestamped directory
+- [ ] **All git commands** wrapped with git_logged
+- [ ] **All API calls** logged with responses preserved
+- [ ] **All script executions** logged with output captured
+- [ ] **Every major decision** documented with reasoning
+- [ ] **Every pattern discovery** logged with evidence
+- [ ] **All verification steps** documented with results
+- [ ] **File samples** preserved for key evidence
+- [ ] **Session finalized** with summary and archive
+- [ ] **Audit validation** confirms completeness
+
+## 🎯 Post-Audit Learning
+
+### Rule Updates Based On:
+- **New tools used** → Add logging wrappers
+- **Missing evidence types** → Add preservation functions  
+- **Verification gaps** → Add cross-check requirements
+- **Process improvements** → Update templates
+
+**Critical Lesson from PRs 234-247:**
+**NO AUDIT WITHOUT LOGGING = NO CREDIBLE EVIDENCE**
+
+See also:
+- [system-gaming-audit.mdc](mdc:system-gaming-audit.mdc) for comprehensive audit methodology
+- [quick-audit-commands.mdc](mdc:quick-audit-commands.mdc) for rapid analysis with logging
+- [enhanced-audit-logging.mdc](mdc:enhanced-audit-logging.mdc) for detailed logging implementation

@@ -5,156 +5,317 @@ alwaysApply: false
 ---
 # Quick Audit Commands Reference
 
+## 🚨 MANDATORY: Quick Audit Session Setup
+
+### Rapid Session Initialization (30 seconds)
+```bash
+# Quick audit session for rapid analysis
+QUICK_AUDIT="quick_audit_$(date +%Y%m%d_%H%M%S)"
+mkdir -p "$QUICK_AUDIT"
+cd "$QUICK_AUDIT"
+
+# Start logging
+exec > >(tee quick_audit.log) 2>&1
+echo "=== QUICK AUDIT START ===" 
+echo "Session: $QUICK_AUDIT"
+echo "Time: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+echo "Repo: $(git remote get-url origin 2>/dev/null || echo 'Local')"
+echo "======================"
+
+# Quick logging function
+log_cmd() {
+    echo "CMD: $*" | tee -a commands.log
+    "$@" 2>&1 | tee -a output.log
+    echo "---" | tee -a commands.log
+}
+```
+
 ## 🚀 Rapid Gaming Detection Commands
 
-### 1-Minute Health Check
+### 1-Minute Health Check (WITH LOGGING)
 ```bash
+echo "=== 1-MINUTE HEALTH CHECK ===" | tee health_check.log
+
 # Get recent activity overview
-git log --oneline -20
+log_cmd git log --oneline -20 | tee recent_activity.log
 
 # Check for suspicious timing patterns
-git log --pretty=format:"%an %ad %s" --date=format:"%H:%M" -20 | grep -E "(00:|01:|02:|03:|04:|05:)"
+log_cmd git log --pretty=format:"%an %ad %s" --date=format:"%H:%M" -20 | grep -E "(00:|01:|02:|03:|04:|05:)" | tee suspicious_timing.log
 
 # Find repetitive commit messages
-git log --pretty=format:"%s" -50 | sort | uniq -c | sort -nr | head -10
+log_cmd git log --pretty=format:"%s" -50 | sort | uniq -c | sort -nr | head -10 | tee repetitive_messages.log
+
+echo "Health check complete: $(date)" | tee -a health_check.log
 ```
 
-### 5-Minute Deep Scan
+### 5-Minute Deep Scan (WITH EVIDENCE PRESERVATION)
 ```bash
+echo "=== 5-MINUTE DEEP SCAN ===" | tee deep_scan.log
+
 # Analyze specific developer (replace <author>)
-git log --author="<author>" --pretty=format:"%ad %s" --date=format:"%m/%d %H:%M" --since="2 weeks ago"
+read -p "Enter author name: " AUTHOR
+log_cmd git log --author="$AUTHOR" --pretty=format:"%ad %s" --date=format:"%m/%d %H:%M" --since="2 weeks ago" | tee author_${AUTHOR}_analysis.log
 
 # Check PR merge patterns
-git log --grep="Merge pull request" --pretty=format:"%ad %s" --date=format:"%m/%d %H:%M" -10
+log_cmd git log --grep="Merge pull request" --pretty=format:"%ad %s" --date=format:"%m/%d %H:%M" -10 | tee pr_patterns.log
 
 # Verify commit-to-change ratios
-git log --stat --since="1 week ago" | grep -E "(files? changed|Author:)"
+log_cmd git log --stat --since="1 week ago" | grep -E "(files? changed|Author:)" | tee commit_ratios.log
+
+echo "Deep scan complete: $(date)" | tee -a deep_scan.log
 ```
 
-### Suspicious Pattern Detection
+### Suspicious Pattern Detection (WITH RISK SCORING)
 ```bash
+echo "=== PATTERN DETECTION ===" | tee pattern_detection.log
+
 # Find commits made in rapid succession (< 5 minutes apart)
-git log --pretty=format:"%at %an %s" --since="1 month ago" | sort -n | awk '{
+log_cmd git log --pretty=format:"%at %an %s" --since="1 month ago" | sort -n | awk '{
   if (prev && $1 - prev < 300 && $2 == prev_author) {
     print "RAPID: " strftime("%Y-%m-%d %H:%M", prev) " -> " strftime("%Y-%m-%d %H:%M", $1) " by " $2
   }
   prev = $1; prev_author = $2
-}'
+}' | tee rapid_commits.log
+
+# Count rapid commit instances for risk scoring
+RAPID_COUNT=$(wc -l < rapid_commits.log)
+echo "RISK_METRIC: Rapid commits found: $RAPID_COUNT" | tee -a pattern_detection.log
+if [ $RAPID_COUNT -gt 10 ]; then
+    echo "🔴 HIGH RISK: >10 rapid commit sequences" | tee -a pattern_detection.log
+elif [ $RAPID_COUNT -gt 5 ]; then
+    echo "🟡 MEDIUM RISK: 5-10 rapid commit sequences" | tee -a pattern_detection.log
+else
+    echo "🟢 LOW RISK: <5 rapid commit sequences" | tee -a pattern_detection.log
+fi
 
 # Check for artificial PR splitting
-git branch -r | grep -E "(modif|fix|temp|test)" | head -10
+log_cmd git branch -r | grep -E "(modif|fix|temp|test)" | head -10 | tee suspicious_branches.log
+
+echo "Pattern detection complete: $(date)" | tee -a pattern_detection.log
 ```
 
-## 🔍 File-Level Gaming Detection
+## 🔍 File-Level Gaming Detection (WITH SAMPLES)
 
-### Empty/Trivial Commit Check
+### Empty/Trivial Commit Check (WITH PRESERVATION)
 ```bash
-# Find commits with minimal changes
-git log --pretty=format:"%h %s" --shortstat --since="1 month ago" | grep -B1 -A1 "1 file.*1 insertion.*1 deletion"
+echo "=== TRIVIAL COMMIT ANALYSIS ===" | tee trivial_analysis.log
+
+# Find commits with minimal changes and preserve samples
+log_cmd git log --pretty=format:"%h %s" --shortstat --since="1 month ago" | grep -B1 -A1 "1 file.*1 insertion.*1 deletion" | tee minimal_changes.log
 
 # Check for whitespace-only changes
-git log --check --since="1 month ago"
+log_cmd git log --check --since="1 month ago" | tee whitespace_changes.log
 
-# Find commits that only modify formatting
-git log -p --since="1 week ago" | grep -B5 -A5 "^-[ \t]*$\|^+[ \t]*$"
+# Find commits that only modify formatting and sample them
+FORMATTING_COMMITS=$(git log --pretty=format:"%H" -p --since="1 week ago" | grep -B5 -A5 "^-[ \t]*$\|^+[ \t]*$" | grep "^commit" | head -3)
+echo "FORMATTING_SAMPLE: $FORMATTING_COMMITS" | tee formatting_commits.log
+
+echo "Trivial commit analysis complete: $(date)" | tee -a trivial_analysis.log
 ```
 
-### Duplicate Content Detection
+### Duplicate Content Detection (WITH VERIFICATION)
 ```bash
+echo "=== DUPLICATE CONTENT ANALYSIS ===" | tee duplicate_analysis.log
+
 # Check for copy-paste across files
-find . -name "*.js" -o -name "*.jsx" -o -name "*.ts" -o -name "*.tsx" | xargs md5sum | sort | uniq -d -w 32
+find . -name "*.js" -o -name "*.jsx" -o -name "*.ts" -o -name "*.tsx" | xargs md5sum | sort | uniq -d -w 32 | tee duplicate_files.log
+
+# Count duplicates for risk assessment
+DUPLICATE_COUNT=$(wc -l < duplicate_files.log)
+echo "RISK_METRIC: Duplicate files found: $DUPLICATE_COUNT" | tee -a duplicate_analysis.log
 
 # Look for suspiciously similar commit diffs
-git log --pretty=format:"%H" --since="1 month ago" | head -20 | xargs -I {} git show --stat {} | grep "files changed" | sort | uniq -c | sort -nr
+log_cmd git log --pretty=format:"%H" --since="1 month ago" | head -20 | xargs -I {} git show --stat {} | grep "files changed" | sort | uniq -c | sort -nr | tee similar_diffs.log
+
+echo "Duplicate content analysis complete: $(date)" | tee -a duplicate_analysis.log
 ```
 
-## 📊 Velocity Analysis
+## 📊 Velocity Analysis (WITH CALCULATIONS)
 
-### Line Count Reality Check
+### Line Count Reality Check (WITH THRESHOLDS)
 ```bash
-# Calculate lines per hour by author
-git log --author="<author>" --pretty=format:"%at" --numstat --since="1 week ago" | awk '
+echo "=== VELOCITY ANALYSIS ===" | tee velocity_analysis.log
+
+# Prompt for author if not set
+if [ -z "$AUTHOR" ]; then
+    read -p "Enter author name for velocity analysis: " AUTHOR
+fi
+
+# Calculate lines per hour by author and evaluate
+log_cmd git log --author="$AUTHOR" --pretty=format:"%at" --numstat --since="1 week ago" | awk '
 /^[0-9]/ { time = $1; next }
 /^[0-9]+.*/ { added += $1; deleted += $2 }
 END { 
   hours = (systime() - time) / 3600
-  print "Lines/hour: " (added + deleted) / hours
-}'
+  lph = (added + deleted) / hours
+  print "Lines/hour: " lph
+  if (lph > 85) print "🔴 CRITICAL: >85 lines/hour (investigate immediately)"
+  else if (lph > 50) print "🟡 WARNING: >50 lines/hour (review process)"
+  else print "🟢 NORMAL: <50 lines/hour"
+}' | tee velocity_${AUTHOR}.log
 
 # Find suspiciously large commits
-git log --pretty=format:"%h %an %s" --shortstat --since="1 month ago" | grep -B1 "insertions.*deletions" | grep -E "[0-9]{4,}"
+log_cmd git log --pretty=format:"%h %an %s" --shortstat --since="1 month ago" | grep -B1 "insertions.*deletions" | grep -E "[0-9]{4,}" | tee large_commits.log
+
+LARGE_COMMIT_COUNT=$(wc -l < large_commits.log)
+echo "RISK_METRIC: Large commits (>1000 lines): $LARGE_COMMIT_COUNT" | tee -a velocity_analysis.log
+
+echo "Velocity analysis complete: $(date)" | tee -a velocity_analysis.log
 ```
 
-### Contribution Pattern Analysis
+### Contribution Pattern Analysis (WITH ANOMALY DETECTION)
 ```bash
+echo "=== CONTRIBUTION PATTERN ANALYSIS ===" | tee contribution_analysis.log
+
 # Check commit distribution by hour of day
-git log --pretty=format:"%ad" --date=format:"%H" --since="1 month ago" | sort | uniq -c
+log_cmd git log --pretty=format:"%ad" --date=format:"%H" --since="1 month ago" | sort | uniq -c | tee hourly_distribution.log
 
 # Find weekend/late night commit sprees
-git log --pretty=format:"%ad %an" --date=format:"%a %H:%M" --since="1 month ago" | grep -E "(Sat|Sun|0[0-5]:|2[2-3]:)"
+log_cmd git log --pretty=format:"%ad %an" --date=format:"%a %H:%M" --since="1 month ago" | grep -E "(Sat|Sun|0[0-5]:|2[2-3]:)" | tee unusual_timing.log
+
+UNUSUAL_COUNT=$(wc -l < unusual_timing.log)
+echo "RISK_METRIC: Unusual timing commits: $UNUSUAL_COUNT" | tee -a contribution_analysis.log
+
+echo "Contribution pattern analysis complete: $(date)" | tee -a contribution_analysis.log
 ```
 
-## 🚨 Red Flag Alerting
+## 🚨 Red Flag Alerting (ENHANCED WITH SCORING)
 
-### Automated Red Flag Detection
+### Automated Red Flag Detection (WITH RISK SCORES)
 ```bash
-# Generate red flag report
-echo "=== RED FLAG REPORT ===" > audit_report.txt
-echo "Generated: $(date)" >> audit_report.txt
-echo "" >> audit_report.txt
+echo "=== RED FLAG REPORT ===" | tee red_flag_report.txt
+echo "Generated: $(date)" | tee -a red_flag_report.txt
+echo "Session: $QUICK_AUDIT" | tee -a red_flag_report.txt
+echo "" | tee -a red_flag_report.txt
 
-# Check for rapid commits
-echo "RAPID COMMITS (< 5 min apart):" >> audit_report.txt
-git log --pretty=format:"%at %an %s" --since="2 weeks ago" | sort -n | awk '{
+# Initialize risk score
+TOTAL_RISK_SCORE=0
+
+# Check for rapid commits and score
+echo "RAPID COMMITS (< 5 min apart):" | tee -a red_flag_report.txt
+RAPID_COMMITS=$(git log --pretty=format:"%at %an %s" --since="2 weeks ago" | sort -n | awk '{
   if (prev && $1 - prev < 300 && $2 == prev_author) {
     print "⚠️  " strftime("%m/%d %H:%M", prev) " -> " strftime("%H:%M", $1) " by " $2
   }
   prev = $1; prev_author = $2
-}' >> audit_report.txt
+}' | tee -a red_flag_report.txt)
 
-# Check for repetitive messages
-echo "" >> audit_report.txt
-echo "REPETITIVE COMMIT MESSAGES:" >> audit_report.txt
-git log --pretty=format:"%s" --since="2 weeks ago" | sort | uniq -c | sort -nr | head -5 | awk '$1 > 3 {print "⚠️  " $1 "x: " substr($0, index($0,$2))}' >> audit_report.txt
+RAPID_COUNT=$(echo "$RAPID_COMMITS" | wc -l)
+RAPID_SCORE=$((RAPID_COUNT * 5))
+TOTAL_RISK_SCORE=$((TOTAL_RISK_SCORE + RAPID_SCORE))
+echo "Rapid commit score: $RAPID_SCORE" | tee -a red_flag_report.txt
 
-cat audit_report.txt
+# Check for repetitive messages and score
+echo "" | tee -a red_flag_report.txt
+echo "REPETITIVE COMMIT MESSAGES:" | tee -a red_flag_report.txt
+REPETITIVE_MESSAGES=$(git log --pretty=format:"%s" --since="2 weeks ago" | sort | uniq -c | sort -nr | head -5 | awk '$1 > 3 {print "⚠️  " $1 "x: " substr($0, index($0,$2))}' | tee -a red_flag_report.txt)
+
+REPETITIVE_COUNT=$(echo "$REPETITIVE_MESSAGES" | wc -l)
+REPETITIVE_SCORE=$((REPETITIVE_COUNT * 10))
+TOTAL_RISK_SCORE=$((TOTAL_RISK_SCORE + REPETITIVE_SCORE))
+echo "Repetitive message score: $REPETITIVE_SCORE" | tee -a red_flag_report.txt
+
+# Calculate final risk assessment
+echo "" | tee -a red_flag_report.txt
+echo "=== RISK ASSESSMENT ===" | tee -a red_flag_report.txt
+echo "Total Risk Score: $TOTAL_RISK_SCORE" | tee -a red_flag_report.txt
+
+if [ $TOTAL_RISK_SCORE -gt 50 ]; then
+    echo "🔴 CRITICAL RISK: Immediate investigation required" | tee -a red_flag_report.txt
+elif [ $TOTAL_RISK_SCORE -gt 25 ]; then
+    echo "🟡 MEDIUM RISK: Review process and patterns" | tee -a red_flag_report.txt
+else
+    echo "🟢 LOW RISK: Continue monitoring" | tee -a red_flag_report.txt
+fi
+
+cat red_flag_report.txt
 ```
 
-## 🎯 GitHub API Cross-Reference
+## 🎯 GitHub API Cross-Reference (WITH VERIFICATION LOGS)
 
-### Verify Against GitHub Data
+### Verify Against GitHub Data (WITH LOGGING)
 ```bash
+echo "=== GITHUB VERIFICATION ===" | tee github_verification.log
+
 # Check if local git matches GitHub (requires gh CLI)
-gh pr list --state merged --limit 10 --json number,additions,deletions,changedFiles
+if command -v gh >/dev/null; then
+    log_cmd gh pr list --state merged --limit 10 --json number,additions,deletions,changedFiles | tee github_pr_data.json
+    
+    # Compare with local analysis
+    log_cmd git log --grep="Merge pull request #" --oneline -10 | while read line; do
+        pr_num=$(echo $line | grep -o "#[0-9]*" | cut -c2-)
+        echo "PR #$pr_num: Local vs GitHub verification needed" | tee -a pr_comparison.log
+    done
+else
+    echo "GitHub CLI not available - manual verification required" | tee -a github_verification.log
+fi
 
-# Compare with local analysis
-git log --grep="Merge pull request #" --oneline -10 | while read line; do
-  pr_num=$(echo $line | grep -o "#[0-9]*" | cut -c2-)
-  echo "PR #$pr_num local vs GitHub comparison needed"
-done
+echo "GitHub verification complete: $(date)" | tee -a github_verification.log
 ```
 
-## ⚡ Quick Decision Matrix
+## ⚡ Quick Decision Matrix (ENHANCED)
 
-### Gaming Indicators Severity
+### Gaming Indicators Severity (WITH ACTIONS)
 ```
-🔴 CRITICAL (Investigate Immediately):
+🔴 CRITICAL (Risk Score >50 - Investigate Immediately):
 - Empty commits with activity timestamps
 - Identical PRs with same file counts
 - 10+ commits in 30 minutes with substantial changes
 - Copy-paste code across multiple repos
+ACTION: Full audit with [system-gaming-audit.mdc](mdc:system-gaming-audit.mdc)
 
-🟡 WARNING (Review Process):
+🟡 WARNING (Risk Score 25-50 - Review Process):
 - Generic commit messages (>50% of commits)
 - Batch commits after long silence periods  
 - Large PRs (>1000 lines) without justification
 - No code review on substantial changes
+ACTION: Process review and monitoring
 
-🟢 ACCEPTABLE (Monitor):
+🟢 ACCEPTABLE (Risk Score <25 - Monitor):
 - Intensive legitimate work periods
 - Poor commit message quality
 - Suboptimal PR organization
 - Tool/environment issues
+ACTION: Continue regular monitoring
 ```
 
-Use [system-gaming-audit.mdc](mdc:system-gaming-audit.mdc) for comprehensive audit methodology.
+## 🏁 Quick Session Finalization (MANDATORY)
+
+### Complete Quick Audit (30 seconds)
+```bash
+# Generate quick summary
+echo "=== QUICK AUDIT SUMMARY ===" | tee quick_summary.md
+echo "Session: $QUICK_AUDIT" | tee -a quick_summary.md
+echo "Duration: $(date)" | tee -a quick_summary.md
+echo "Files generated: $(ls -1 | wc -l)" | tee -a quick_summary.md
+echo "Risk Score: $TOTAL_RISK_SCORE" | tee -a quick_summary.md
+
+# Archive if needed
+if [ $TOTAL_RISK_SCORE -gt 25 ]; then
+    cd ..
+    tar -czf "${QUICK_AUDIT}.tar.gz" "$QUICK_AUDIT"
+    echo "High risk detected - session archived: ${QUICK_AUDIT}.tar.gz"
+fi
+
+echo "Quick audit session complete."
+```
+
+## 📚 Escalation Path
+
+### When to Use Full Audit
+- Risk Score > 50
+- Multiple red flags detected
+- Pattern requires detailed investigation
+- Evidence preservation needed for formal report
+
+**Next Steps:**
+1. Use [system-gaming-audit.mdc](mdc:system-gaming-audit.mdc) for comprehensive analysis
+2. Follow [enhanced-audit-logging.mdc](mdc:enhanced-audit-logging.mdc) for evidence preservation
+3. Generate formal audit report with [DEVELOPMENT_ACTIVITY_AUDIT_REPORT.md](mdc:DEVELOPMENT_ACTIVITY_AUDIT_REPORT.md) template
+
+### Learning Loop
+Update these commands based on:
+- New pattern discoveries
+- False positive patterns identified  
+- Tool reliability issues
+- Process improvements needed
